@@ -42,7 +42,7 @@ class DIP_VAE(object):
                 print("    Autoencoder loss (test) %f\n    Reconstruction loss (test) %f" % (ae_test_loss, recon_test_loss), flush=True)
                 print("    Autoencoder loss (test) %f\n    Reconstruction loss (test) %f" % (ae_test_loss, recon_test_loss), flush=True, file=open(self.type + '_train.log','a'))
 
-            if it % 200 == 0:
+            if it % 10000 == 0:
                 model_path = self.type + "_checkpoints/model"
                 save_path = self.saver.save(self.sess, model_path, global_step=it)
                 print("Model saved to: %s" % save_path)
@@ -108,7 +108,7 @@ class DIP_VAE(object):
             d_1 = tf.layers.dense(inputs=inputs, units=1200, activation=tf.nn.tanh, name="d_1", reuse=reuse)
             d_2 = tf.layers.dense(inputs=d_1, units=1200, activation=tf.nn.tanh, name="d_2", reuse=reuse)
             d_3 = tf.layers.dense(inputs=d_2, units=1200, activation=tf.nn.tanh, name="d_3", reuse=reuse)
-            d_4 = tf.layers.dense(inputs=d_3, units=4096, activation=tf.nn.tanh, name="d_4", reuse=reuse)
+            d_4 = tf.layers.dense(inputs=d_3, units=4096, name="d_4", reuse=reuse)
             d_out = tf.reshape(d_4, shape=[-1, 64, 64, 1])
         return d_out
 
@@ -185,7 +185,7 @@ class DIP_VAE(object):
     def _optimizer_init(self):
         enc_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='encoder')
         dec_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='decoder')
-        train_step = tf.train.AdamOptimizer(learning_rate=10e-4).minimize(self.auto_encoder_loss, var_list=enc_vars+dec_vars)
+        train_step = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(self.auto_encoder_loss, var_list=enc_vars+dec_vars)
 
         return train_step
 
